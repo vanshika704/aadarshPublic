@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; 
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { Edit, Save, X, Upload } from 'lucide-react';
-// 1. Import Auth Context
 import { useAuth } from '../context/AuthContext';
-// 2. Import Service Functions
 import { updateAnnualFunctionData, uploadFile } from '../services/content.service';
 
 /* ---------------- DEFAULT DATA ---------------- */
@@ -14,21 +13,26 @@ const DEFAULTS = {
   description: "The much awaited Annual Function was organized at Adarsh Senior Secondary Public School - Nahra to recognize shining stars of the school amidst great zest, vibrancy and elation. The programme commenced with the lighting of the Ceremonial lamp by the Chief Guest escorted by the other dignitaries and the Principal."
 };
 
-const AnnualFunction = ({ data }) => {
-  // 3. Get User Role for Security
+const AnnualFunction = ({ data, refreshData }) => {
   const { currentUser, userRole } = useAuth();
   const isAdmin = currentUser && userRole === 'admin';
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // Initialize form with passed data or defaults
-  const [formData, setFormData] = useState({ ...DEFAULTS, ...data });
+  // Initialize state with defaults. We don't worry about 'data' here yet.
+  // The display logic handles the 'view' mode, and startEdit handles the 'edit' mode.
+  const [formData, setFormData] = useState(DEFAULTS);
 
-  // Source of truth for rendering: Edited data vs Props data
+  // --- LOGIC EXPLANATION ---
+  // 1. VIEW MODE: We combine DEFAULTS + data (from props). This ensures we always see the latest data.
+  // 2. EDIT MODE: We use formData (state).
   const displayData = isEditing ? formData : { ...DEFAULTS, ...data };
 
-  // Start editing (copy current data to form)
+  // --- HANDLERS ---
+  
+  // FIX: Capture the latest data ONLY when the user clicks Edit.
+  // This removes the need for useEffect and fixes the error.
   const startEdit = () => {
     setFormData({ ...DEFAULTS, ...data });
     setIsEditing(true);
@@ -61,10 +65,9 @@ const AnnualFunction = ({ data }) => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // 4. Save to Firestore
       await updateAnnualFunctionData(formData);
+      if (refreshData) await refreshData();
       setIsEditing(false);
-      // Optional: Add a toast notification here
       alert("Annual Function section updated successfully!");
     } catch (error) {
       console.error(error);
@@ -182,13 +185,17 @@ const AnnualFunction = ({ data }) => {
             </p>
           )}
 
-          <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: "#fdecec" }}
-            whileTap={{ scale: 0.95 }}
-            className="border border-red-500 text-red-500 px-4 py-2 text-sm font-semibold uppercase tracking-wider w-fit transition-colors duration-300 rounded-sm"
-          >
-            Read More
-          </motion.button>
+          {/* Corrected Link Component */}
+          <Link to="/activities/annual-day">
+              <motion.button
+                whileHover={{ scale: 1.05, backgroundColor: "#fdecec" }}
+                whileTap={{ scale: 0.95 }}
+                className="border border-red-500 text-red-500 px-4 py-2 text-sm font-semibold uppercase tracking-wider w-fit transition-colors duration-300 rounded-sm cursor-pointer"
+              >
+                Read More
+              </motion.button>
+          </Link>
+          
         </div>
       </div>
     </motion.div>

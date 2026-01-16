@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // IMPORT LINK
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Edit, Save, X, Upload, Trash2, Plus, Loader2 } from "lucide-react";
@@ -43,10 +44,14 @@ const FadeIn = ({ children, delay = 0 }) => (
   </motion.div>
 );
 
-const RedButton = ({ text }) => (
-  <button className="bg-[#b93c3c] border border-white/50 text-white text-[10px] px-3 py-1 uppercase font-bold mt-2 hover:bg-[#a32e2e] transition-colors tracking-wider">
+// FIX: Updated to use Link and accept a 'to' prop
+const RedButton = ({ text, to }) => (
+  <Link 
+    to={to} 
+    className="inline-block bg-[#b93c3c] border border-white/50 text-white text-[10px] px-3 py-1 uppercase font-bold mt-2 hover:bg-[#a32e2e] transition-colors tracking-wider cursor-pointer"
+  >
     {text}
-  </button>
+  </Link>
 );
 
 const Divider = () => <div className="w-full h-px bg-slate-400/30 my-5" />;
@@ -55,13 +60,22 @@ const UploadOverlay = ({ onChange }) => (
   <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 transition-opacity opacity-0 hover:opacity-100">
     <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded shadow-lg flex gap-2 items-center hover:bg-gray-100 transition-transform hover:scale-105">
       <Upload size={14} /> <span className="text-xs font-bold uppercase">Change</span>
-      <input type="file" hidden accept="image/*" onChange={onChange} />
+      <input 
+        type="file" 
+        hidden 
+        accept="image/*" 
+        onChange={(e) => {
+            onChange(e);
+            e.target.value = ''; // Reset input so same file can be selected again
+        }} 
+      />
     </label>
   </div>
 );
 
 /* ---------- MAIN COMPONENT ---------- */
-const SchoolInfrastructure = ({ data }) => {
+// FIX: Added refreshData to props destructuring
+const SchoolInfrastructure = ({ data, refreshData }) => {
   // 3. Strict Admin Check
   const { currentUser, userRole } = useAuth();
   const isAdmin = currentUser && userRole === 'admin';
@@ -93,6 +107,7 @@ const SchoolInfrastructure = ({ data }) => {
     setLoading(true);
     try {
       const url = await uploadFile(file, "infra_assets");
+      // Immediate state update to show the new image
       setFormData((prev) => ({ ...prev, [fieldName]: url }));
     } catch (err) {
       console.error(err);
@@ -134,6 +149,10 @@ const SchoolInfrastructure = ({ data }) => {
     setLoading(true);
     try {
       await updateInfraData(formData);
+      
+      // FIX: Refresh the parent data so the new image persists when we exit edit mode
+      if(refreshData) await refreshData();
+      
       setIsEditing(false);
       alert("Infrastructure section updated!");
     } catch (err) {
@@ -233,7 +252,9 @@ const SchoolInfrastructure = ({ data }) => {
             ) : (
               <p className="whitespace-pre-line text-[13px] leading-relaxed text-gray-300 mb-4 text-justify">{formData.infraText}</p>
             )}
-            <RedButton text="READ MORE" />
+            
+            {/* LINK TO FACILITIES */}
+            <RedButton text="READ MORE" to="/facilities" />
           </FadeIn>
           
           <Divider />
@@ -275,7 +296,8 @@ const SchoolInfrastructure = ({ data }) => {
             ) : (
                <p className="text-[13px] text-gray-300 mb-2 leading-relaxed text-justify">{formData.toursText}</p>
             )}
-            <RedButton text="READ MORE" />
+            {/* LINK TO EXCURSIONS */}
+            <RedButton text="READ MORE" to="/activities/excursions" />
           </div>
 
           <Divider />
@@ -296,7 +318,8 @@ const SchoolInfrastructure = ({ data }) => {
             ) : (
                <p className="text-[13px] text-gray-300 mb-2 leading-relaxed text-justify">{formData.dentalText}</p>
             )}
-            <RedButton text="READ MORE" />
+            {/* LINK TO DENTAL */}
+            <RedButton text="READ MORE" to="/activities/dental" />
           </div>
 
         </div>
