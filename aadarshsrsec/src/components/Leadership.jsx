@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Edit2, Save, X, UploadCloud } from 'lucide-react';
-// 1. Use the Context we set up previously
+import { ChevronDown, ChevronUp, Edit2, Save, X, UploadCloud, Loader2 } from 'lucide-react';
+// IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 import { updateLeadershipData, uploadFile } from '../services/content.service';
 
@@ -23,7 +25,7 @@ const EditModal = ({ data, onClose, onSave, isSaving }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
           <h3 className="font-bold text-gray-800">Edit Leader</h3>
@@ -87,7 +89,7 @@ const EditModal = ({ data, onClose, onSave, isSaving }) => {
             disabled={isSaving} 
             className="w-full bg-red-800 text-white py-3 rounded-lg font-bold hover:bg-red-900 transition flex justify-center gap-2 items-center disabled:opacity-70"
           >
-            {isSaving ? "Saving..." : <><Save size={18} /> Save Changes</>}
+            {isSaving ? <><Loader2 className="animate-spin" size={18}/> Saving...</> : <><Save size={18} /> Save Changes</>}
           </button>
         </form>
       </div>
@@ -178,6 +180,8 @@ const LeadershipSection = ({ initialData = [], refreshData }) => {
   // Handle Save
   const handleSave = async (updatedItem, newImageFile) => {
     setIsSaving(true);
+    const toastId = toast.loading("Updating leader...");
+
     try {
       let imageUrl = updatedItem.image;
 
@@ -189,8 +193,7 @@ const LeadershipSection = ({ initialData = [], refreshData }) => {
       // 2. Prepare new item
       const newItem = { ...updatedItem, image: imageUrl };
 
-      // 3. Update the array locally (Optimistic Update)
-      // Note: We use the 'id' field. Ensure your Firestore data has IDs.
+      // 3. Update the array locally
       const newArray = initialData.map(item => 
         item.id === newItem.id ? newItem : item
       );
@@ -199,14 +202,14 @@ const LeadershipSection = ({ initialData = [], refreshData }) => {
       // Pass the array directly as per our service definition
       await updateLeadershipData(newArray);
       
-      // 5. Trigger Parent Refresh to ensure sync
+      // 5. Trigger Parent Refresh
       if(refreshData) await refreshData();
       
       setEditingItem(null);
-      // Optional success feedback could go here
+      toast.success("Leader updated successfully!", { id: toastId });
     } catch (error) {
       console.error("Failed to save:", error);
-      alert("Error saving data. Please try again.");
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setIsSaving(false);
     }

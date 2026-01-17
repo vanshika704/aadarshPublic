@@ -1,144 +1,8 @@
-// import React from 'react';
-// import { FileBadge, Building2, BookOpen } from 'lucide-react';
-// import img1 from "../assets/affiliation.jpg"
-// // COMPONENT: DataRow (Defined OUTSIDE to prevent re-render bugs)
-// const DataRow = ({ label, value, fullWidth = false }) => (
-//   <div className={`py-1.5 ${fullWidth ? 'col-span-full' : ''}`}>
-//     <dt className="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-0.5">{label}</dt>
-//     <dd className="text-slate-800 text-xs md:text-sm font-medium leading-relaxed">{value}</dd>
-//   </div>
-// );
-
-// const Affiliation = ({ data }) => {
-//   // 1. Fallback Data
-//   const defaultContent = {
-//     sectionTitle: "School Status & Affiliation",
-//     image: img1, 
-    
-//     affiliation: {
-//       title: "Official Status",
-//       board: "Central Board of Secondary Education (C.B.S.E.)",
-//       number: "531041",
-//       since: "April, 2012",
-//       extensionUpto: "March, 2020", 
-//       nocNumber: "9/59-07PS(1)",
-//       nocDate: "10/06/2010",
-//       trust: "Shaheed Bhagat Singh Education Society"
-//     },
-
-//     schoolType: {
-//       title: "School Type",
-//       description: "English medium schools affiliated to C.B.S.E., New Delhi. Adarsh school follow C.B.S.E. curriculum & NCERT pattern as per National Curriculum Framework."
-//     },
-//     curriculum: {
-//       title: "Curriculum",
-//       description: "The school follows C.B.S.E. curriculum."
-//     }
-//   };
-
-//   const content = data || defaultContent;
-
-//   return (
-//     // Reduced outer padding: py-8 instead of py-12
-//     <section className="w-full bg-white py-8 px-4 md:px-8">
-//       {/* Reduced max-width: max-w-6xl instead of 7xl */}
-//       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-        
-//         {/* --- Left Column: Elegant Image (Scaled Down) --- */}
-//         {/* Height reduced: h-[350/450px] instead of h-[500/650px] */}
-//         <div className="relative h-[350px] lg:h-[450px] w-full rounded-lg overflow-hidden shadow-md bg-slate-100 group">
-//            <img 
-//              src={content.image} 
-//              alt="School Building" 
-//              className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
-//            />
-//            {/* Minimal Overlay Badge (Smaller) */}
-//            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-2 rounded shadow-sm border border-white/50">
-//               <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest">Affiliation No.</span>
-//               <span className="block text-lg font-bold text-blue-900 leading-tight">{content.affiliation.number}</span>
-//            </div>
-//         </div>
-
-//         {/* --- Right Column: Clean Content --- */}
-//         <div className="flex flex-col justify-center space-y-6">
-          
-//           {/* Header */}
-//           <div className="border-l-2 border-red-700 pl-4">
-//             {/* Font reduced: text-2xl */}
-//             <h2 className="text-xl font-light text-slate-800">
-//               {content.sectionTitle}
-//             </h2>
-//           </div>
-
-//           {/* Affiliation Details - Compact Grid */}
-//           <div className="bg-slate-50/50 rounded-lg p-5 border border-slate-100">
-//             <div className="flex items-center gap-2 mb-4">
-//                 <FileBadge className="text-red-700 w-4 h-4 opacity-80" />
-//                 <h3 className="text-base font-semibold text-blue-900">{content.affiliation.title}</h3>
-//             </div>
-            
-//             <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 divide-y md:divide-y-0 divide-slate-200">
-//                 <DataRow label="Affiliated Board" value={content.affiliation.board} fullWidth />
-                
-//                 <div className="col-span-full h-px bg-slate-200 my-1 hidden md:block"></div>
-                
-//                 <DataRow label="Since" value={content.affiliation.since} />
-//                 <DataRow label="Extension Upto" value={content.affiliation.extensionUpto} />
-                
-//                 <div className="col-span-full h-px bg-slate-200 my-1 hidden md:block"></div>
-
-//                 <DataRow label="NOC No." value={content.affiliation.nocNumber} />
-//                 <DataRow label="NOC Date" value={content.affiliation.nocDate} />
-                
-//                 <div className="col-span-full h-px bg-slate-200 my-1 hidden md:block"></div>
-
-//                 <DataRow label="Managed By Trust" value={content.affiliation.trust} fullWidth />
-//             </dl>
-//           </div>
-
-//           {/* Descriptive Sections - Compact List */}
-//           <div className="space-y-4">
-            
-//             {/* School Type */}
-//             <div className="flex gap-3">
-//                 <div className="mt-0.5 shrink-0">
-//                     <Building2 className="w-4 h-4 text-slate-400" />
-//                 </div>
-//                 <div>
-//                     <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-0.5">{content.schoolType.title}</h4>
-//                     <p className="text-slate-600 text-xs md:text-sm leading-relaxed text-justify">
-//                         {content.schoolType.description}
-//                     </p>
-//                 </div>
-//             </div>
-
-//             {/* Curriculum */}
-//             <div className="flex gap-3">
-//                  <div className="mt-0.5 shrink-0">
-//                     <BookOpen className="w-4 h-4 text-slate-400" />
-//                 </div>
-//                 <div>
-//                     <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-0.5">{content.curriculum.title}</h4>
-//                     <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
-//                         {content.curriculum.description}
-//                     </p>
-//                 </div>
-//             </div>
-
-//           </div>
-
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default Affiliation;
-
-
 import React, { useState, useEffect } from 'react';
 import { FileBadge, Building2, BookOpen, Edit, Save, X, Upload, Loader2 } from 'lucide-react';
-// 1. Auth & Service
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 // FIX: Import getAffiliationData to fetch data directly
 import { getAffiliationData, updateAffiliationData, uploadFile } from '../services/content.service';
@@ -287,13 +151,20 @@ const Affiliation = () => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "affiliation_assets");
       setFormData(prev => ({ ...prev, image: url }));
+      // TOAST: Success
+      toast.success("Image uploaded successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Image upload failed");
+      // TOAST: Error
+      toast.error("Image upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -301,14 +172,19 @@ const Affiliation = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving details...");
+
     try {
       await updateAffiliationData(formData);
       await fetchData(); // Refresh data
       setIsEditing(false);
-      alert("Affiliation details updated!");
+      // TOAST: Success
+      toast.success("Affiliation details updated!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      // TOAST: Error
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -330,7 +206,7 @@ const Affiliation = () => {
 
       {/* SAVE CONTROLS */}
       {isEditing && (
-        <div className="fixed bottom-10 right-10 z-[100] flex gap-2 animate-bounce-in">
+        <div className="fixed bottom-10 right-10 z-100 flex gap-2 animate-bounce-in">
           <button 
             onClick={cancelEdit} 
             className="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-full shadow-xl flex items-center gap-2 font-bold hover:bg-slate-50"

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Edit, Plus, Trash2, X, Save, Loader } from 'lucide-react';
+import { Edit, Plus, Trash2, X, Save, Loader2 } from 'lucide-react'; // Changed Loader to Loader2
+import toast from 'react-hot-toast'; // 1. IMPORT TOAST
+
 import Logo from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,7 +13,7 @@ import { updateActivitiesData, getActivitiesData } from '../services/content.ser
 const BRAND_COLOR = "bg-red-700"; 
 const ACCENT_COLOR = "text-red-700";
 
-// Initial Static Data (Fallback if DB is empty)
+// Initial Static Data
 const INITIAL_MENU_DATA = [
   {
     title: "Prologue",
@@ -210,7 +212,7 @@ const ActivitiesEditor = ({ onClose, currentActivities, onSave }) => {
             disabled={loading}
             className="px-6 py-2 text-sm font-medium text-white bg-red-700 hover:bg-red-800 rounded-lg shadow-md flex items-center gap-2 disabled:opacity-70 transition-all"
           >
-            {loading ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+            {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
             Save Changes
           </button>
         </div>
@@ -262,15 +264,17 @@ function Navbar({ admissionYear = "2025-2026" }) {
     };
 
     fetchNavData();
-  }, []); // Runs once on mount
+  }, []);
 
   // --- HANDLER: Save Updated Activities ---
   const handleSaveActivities = async (newActivitiesList) => {
+    // TOAST: Loading
+    const toastId = toast.loading("Updating Menu...");
     try {
         // 1. Update Backend
         await updateActivitiesData(newActivitiesList); 
         
-        // 2. Update Local State (Immediate Feedback)
+        // 2. Update Local State
         const updatedMenu = menuItems.map(menu => {
             if (menu.title === "Activities") {
                 return { ...menu, items: newActivitiesList };
@@ -278,10 +282,13 @@ function Navbar({ admissionYear = "2025-2026" }) {
             return menu;
         });
         setMenuItems(updatedMenu);
-        alert("Activities updated and saved to Database!");
+        
+        // TOAST: Success
+        toast.success("Menu updated successfully!", { id: toastId });
     } catch (error) {
         console.error("Failed to update menu", error);
-        alert("Failed to save changes.");
+        // TOAST: Error
+        toast.error("Failed to save changes.", { id: toastId });
     }
   };
 
@@ -363,11 +370,11 @@ function Navbar({ admissionYear = "2025-2026" }) {
                       </svg>
                     </button>
 
-                    {/* ADMIN EDIT TRIGGER - Only for Activities */}
+                    {/* ADMIN EDIT TRIGGER */}
                     {isAdmin && menu.title === "Activities" && (
                         <button 
                             onClick={(e) => {
-                                e.stopPropagation(); // Prevent navigation
+                                e.stopPropagation(); 
                                 setIsEditingActivities(true);
                             }}
                             className="ml-1 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"

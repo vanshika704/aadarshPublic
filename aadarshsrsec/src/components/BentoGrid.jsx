@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, Upload, Trash2, Plus, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -94,7 +92,7 @@ const CarouselEditBox = ({ images, isEditing, onAdd, onDelete }) => (
 );
 
 /* --- MAIN COMPONENT --- */
-const Grid = ({ data }) => {
+const Grid = ({ data, refreshData }) => {
   const { currentUser, userRole } = useAuth();
   const isAdmin = currentUser && userRole === 'admin';
   
@@ -104,13 +102,9 @@ const Grid = ({ data }) => {
   // State only used during editing
   const [draft, setDraft] = useState(DEFAULTS);
 
-  // FIX: Determine what to display based on mode. 
-  // If editing, show draft. If not, show live data (or defaults).
-  // This removes the need for useEffect synchronization.
   const view = isEditing ? draft : { ...DEFAULTS, ...data };
 
   const startEdit = () => {
-    // Initialize draft ONLY when user enters edit mode
     setDraft({ ...DEFAULTS, ...data });
     setIsEditing(true);
   };
@@ -157,6 +151,10 @@ const Grid = ({ data }) => {
     setLoading(true);
     try {
       await updateGridData(draft);
+      
+      // FIX: Refresh parent data so changes persist immediately
+      if(refreshData) await refreshData();
+      
       setIsEditing(false);
       alert("Grid section updated successfully!");
     } catch (error) {
@@ -202,13 +200,13 @@ const Grid = ({ data }) => {
       {/* GRID LAYOUT */}
       <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-400 ring-offset-4 rounded-xl p-2' : ''}`}>
         
-        {/* TOPPERS (Static Image) */}
+        {/* TOPPERS */}
         <div className="relative h-64 md:h-96 bg-gray-100 rounded-xl overflow-hidden shadow-sm border border-gray-100">
           <img src={view.toppersPoster} className="w-full h-full object-contain bg-white" alt="Toppers" />
           {isEditing && <UploadOverlay onFile={f => handleUpload(f, 'toppersPoster')} />}
         </div>
 
-        {/* ASSEMBLY (Two Static Images) */}
+        {/* ASSEMBLY */}
         <div className="flex flex-col gap-4 h-64 md:h-96">
           <div className="relative flex-1 bg-gray-100 rounded-xl overflow-hidden shadow-sm border border-gray-100">
             <img src={view.assemblyImg1} className="w-full h-full object-cover" alt="Assembly 1" />
@@ -224,13 +222,13 @@ const Grid = ({ data }) => {
       {/* BOTTOM SECTION */}
       <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300 ${isEditing ? 'ring-2 ring-blue-400 ring-offset-4 rounded-xl p-2 mt-6' : ''}`}>
         
-        {/* ADVERTISEMENT (Static Image) */}
+        {/* ADVERTISEMENT */}
         <div className="relative h-64 md:h-96 bg-gray-100 rounded-xl overflow-hidden shadow-sm border border-gray-100">
           <img src={view.advPoster} className="w-full h-full object-contain bg-white" alt="Advertisement" />
           {isEditing && <UploadOverlay onFile={f => handleUpload(f, 'advPoster')} />}
         </div>
 
-        {/* CAROUSELS (Two Dynamic Carousels) */}
+        {/* CAROUSELS */}
         <div className="flex flex-col gap-4 h-auto md:h-96">
           <CarouselEditBox 
             images={view.topCarousel} 

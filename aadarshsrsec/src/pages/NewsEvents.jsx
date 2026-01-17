@@ -7,8 +7,11 @@ import {
   Trash2, 
   Plus, 
   Loader2, 
-  Maximize2 // Imported for the hover icon
+  Maximize2 
 } from 'lucide-react';
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 import { getNewsData, updateNewsData, uploadFile } from '../services/content.service';
 
@@ -55,6 +58,7 @@ const NewsGallery = () => {
       }
     } catch (error) {
       console.error("Error fetching gallery:", error);
+      toast.error("Failed to load gallery.");
     }
   };
 
@@ -73,6 +77,9 @@ const NewsGallery = () => {
     if (!file) return;
 
     setUploading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading photo...");
+
     try {
       const url = await uploadFile(file, "news_gallery");
       const newItem = {
@@ -84,9 +91,12 @@ const NewsGallery = () => {
         ...prev,
         gallery: [newItem, ...prev.gallery]
       }));
+      // TOAST: Success
+      toast.success("Photo added!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      // TOAST: Error
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -99,17 +109,23 @@ const NewsGallery = () => {
       ...prev,
       gallery: prev.gallery.filter(item => item.id !== id)
     }));
+    toast.success("Photo removed (Click Save to apply).");
   };
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving gallery...");
+
     try {
       await updateNewsData(data);
       setIsEditing(false);
-      alert("Gallery updated successfully!");
+      // TOAST: Success
+      toast.success("Gallery updated successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      // TOAST: Error
+      toast.error("Failed to save gallery.", { id: toastId });
     } finally {
       setLoading(false);
     }

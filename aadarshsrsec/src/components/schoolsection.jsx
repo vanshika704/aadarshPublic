@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Bell, GraduationCap, Edit, Save, X, Upload } from 'lucide-react';
+import { Users, Bell, GraduationCap, Edit, Save, X, Upload, Loader2 } from 'lucide-react';
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 // Import ALL update functions
 import { 
@@ -77,12 +80,18 @@ const SchoolSection = ({ aboutData, principalData, miscData, refreshData }) => {
     if (!file) return;
 
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "school_assets");
       setFormData(prev => ({ ...prev, flagImage: url }));
+      // TOAST: Success
+      toast.success("Image uploaded!", { id: toastId });
     } catch (error) {
       console.error("Upload failed", error);
-      alert("Image upload failed");
+      // TOAST: Error
+      toast.error("Image upload failed", { id: toastId });
     }
     setLoading(false);
   };
@@ -90,6 +99,9 @@ const SchoolSection = ({ aboutData, principalData, miscData, refreshData }) => {
   // --- SAVE LOGIC ---
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving sections...");
+
     try {
       // 1. Update About Page
       const aboutPayload = { 
@@ -118,10 +130,12 @@ const SchoolSection = ({ aboutData, principalData, miscData, refreshData }) => {
       if (refreshData) await refreshData();
 
       setIsEditing(false);
-      alert("All sections updated successfully!");
+      // TOAST: Success
+      toast.success("All sections updated successfully!", { id: toastId });
     } catch (error) {
       console.error("Save failed", error);
-      alert("Failed to save changes.");
+      // TOAST: Error
+      toast.error("Failed to save changes.", { id: toastId });
     }
     setLoading(false);
   };
@@ -153,7 +167,8 @@ const SchoolSection = ({ aboutData, principalData, miscData, refreshData }) => {
               disabled={loading}
               className="bg-zinc-900 text-white px-5 py-2 rounded-full text-sm font-medium shadow-lg flex items-center gap-2 hover:bg-black disabled:opacity-70"
             >
-              {loading ? "Saving..." : <><Save size={14} /> Save Changes</>}
+              {loading ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} 
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         )}
@@ -216,7 +231,7 @@ const SchoolSection = ({ aboutData, principalData, miscData, refreshData }) => {
               isEditing={isEditing}
               onChange={handleChange}
               link="/activities"
-              className="-mt-4" // FIX: Shift Activities up
+              className="-mt-4" 
             />
 
             <div className="flex items-end justify-center px-2">

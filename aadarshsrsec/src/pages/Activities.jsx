@@ -20,7 +20,21 @@ const DEFAULT_FORM = {
   image: '' 
 };
 
-// --- 1. ADMIN MODAL (Fixed) ---
+// --- FALLBACK CATEGORIES (Safety Net) ---
+// If the database returns nothing (e.g. first time setup), these will show up.
+const STATIC_CATEGORIES = [
+  { label: "Sports Meet", value: "sports" },
+  { label: "Annual Day", value: "annual-day" },
+  { label: "Diwali Celebrations", value: "diwali" },
+  { label: "Rakhi Making", value: "rakhi" },
+  { label: "Janmashtami", value: "janmashtami" },
+  { label: "Clean India", value: "clean-india" },
+  { label: "Dental Camp", value: "dental" },
+  { label: "Excursions", value: "excursions" },
+  { label: "Lab Activities", value: "lab" },
+];
+
+// --- 1. ADMIN MODAL ---
 const AdminModal = ({ onClose, onSubmit, initialData, categories }) => {
   const isEditing = !!initialData; 
 
@@ -28,25 +42,21 @@ const AdminModal = ({ onClose, onSubmit, initialData, categories }) => {
     if (initialData) return initialData;
     return {
       ...DEFAULT_FORM,
+      // Default to first available category
       category: categories && categories.length > 0 ? categories[0].value : ''
     };
   });
 
-  // State to hold multiple files
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // REMOVED: The problematic useEffect. 
-  // Since the parent now unmounts this component when closed, 
-  // 'files' and 'loading' will automatically reset on every open.
 
   const handleFileChange = (e) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
       if (isEditing) {
-        setFiles([selectedFiles[0]]); // Single file for edit
+        setFiles([selectedFiles[0]]);
       } else {
-        setFiles(prev => [...prev, ...selectedFiles]); // Multiple for add
+        setFiles(prev => [...prev, ...selectedFiles]);
       }
     }
   };
@@ -62,7 +72,6 @@ const AdminModal = ({ onClose, onSubmit, initialData, categories }) => {
       return;
     }
 
-    // Validation
     if (!isEditing && files.length === 0) {
         alert("Please select at least one photo.");
         return;
@@ -99,13 +108,13 @@ const AdminModal = ({ onClose, onSubmit, initialData, categories }) => {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Select Category</label>
             <select 
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
               value={formData.category} 
               onChange={e => setFormData({...formData, category: e.target.value})}
             >
               <option value="" disabled>Select a category...</option>
-              {categories.map(c => (
-                <option key={c.value} value={c.value}>{c.label}</option>
+              {categories.map((c, idx) => (
+                <option key={idx} value={c.value}>{c.label}</option>
               ))}
             </select>
           </div>
@@ -181,26 +190,39 @@ export default function Activities() {
   const [categories, setCategories] = useState([]); 
   const [loading, setLoading] = useState(true);
   
-  // Admin State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
+  // --- FETCH DATA ---
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // 1. Fetch Images
       const imagesData = await getActivities();
       setActivities(imagesData);
 
+      // 2. Fetch Categories (With Fallback Logic)
       const navbarItems = await getActivitiesData();
-      if (navbarItems && Array.isArray(navbarItems)) {
-        const formattedCats = navbarItems.map(item => ({
+      
+      let finalCategories = STATIC_CATEGORIES; // Start with fallback
+
+      if (navbarItems && Array.isArray(navbarItems) && navbarItems.length > 0) {
+        // Data exists in DB, map it
+        finalCategories = navbarItems.map(item => ({
             label: item.name,
             value: item.path.split('/').pop()
         }));
-        setCategories(formattedCats);
+      } else {
+        console.warn("No categories found in DB (Navbar not saved yet?). Using static defaults.");
       }
+      
+      setCategories(finalCategories);
+
     } catch (error) {
       console.error("Failed to load data", error);
+      // Even on error, use static categories so admin isn't locked out
+      setCategories(STATIC_CATEGORIES);
     } finally {
       setLoading(false);
     }
@@ -211,18 +233,17 @@ export default function Activities() {
   }, [fetchData]);
 
   const filtered = category ? activities.filter(a => a.category === category) : activities;
-  const displayTitle = category 
-    ? categories.find(c => c.value === category)?.label 
-    : "Activities Gallery";
+  
+  // Find display title
+  const currentCatObj = categories.find(c => c.value === category);
+  const displayTitle = currentCatObj ? currentCatObj.label : "Activities Gallery";
 
   // --- ACTIONS ---
   const handleSave = async (data, files) => {
     if (editingItem) {
-        // Edit Mode (Single)
         const fileToUpload = files.length > 0 ? files[0] : null;
         await updateActivity(editingItem.id, data, fileToUpload);
     } else {
-        // Add Mode (Bulk)
         const uploadPromises = files.map(file => addActivity(data, file));
         await Promise.all(uploadPromises);
     }
@@ -281,7 +302,7 @@ export default function Activities() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   whileHover={{ y: -5 }}
-                  className="relative group rounded-xl overflow-hidden shadow-md bg-white aspect-[4/3]"
+                  className="relative group rounded-xl overflow-hidden shadow-md bg-white aspect-4/3"
                 >
                   {/* ADMIN CONTROLS */}
                   {isAdmin && (
@@ -321,9 +342,6 @@ export default function Activities() {
         )}
       </div>
 
-      {/* FIX: Conditionally render the modal using && 
-        This destroys the component when closed, forcing a state reset on open. 
-      */}
       {isModalOpen && (
         <AdminModal 
           onClose={() => setIsModalOpen(false)} 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Eye, Edit, Save, X, Upload, Loader2 } from 'lucide-react';
-// 1. Auth & Service
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 // FIX: Import getMissionVisionData to fetch data directly
 import { getMissionVisionData, updateMissionVisionData, uploadFile } from '../services/content.service';
@@ -67,6 +69,7 @@ const MissionVision = () => {
       setServerData(data);
     } catch (error) {
       console.error("Error fetching mission/vision data:", error);
+      toast.error("Failed to load content.");
     }
   };
 
@@ -116,13 +119,13 @@ const MissionVision = () => {
     }));
   };
 
-  // 2. Mission Array (Joined by double newline for editing)
+  // 2. Mission Array
   const handleMissionTextChange = (e) => {
     const paragraphs = e.target.value.split('\n\n');
     handleNestedChange('mission', 'text', paragraphs);
   };
 
-  // 3. Vision Array (Joined by single newline for editing bullet points)
+  // 3. Vision Array
   const handleVisionPointsChange = (e) => {
     const points = e.target.value.split('\n').filter(line => line.trim() !== "");
     handleNestedChange('vision', 'points', points);
@@ -132,16 +135,23 @@ const MissionVision = () => {
   const handleImageUpload = async (e, key) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "mission_assets");
       setFormData(prev => ({
         ...prev,
         images: { ...prev.images, [key]: url }
       }));
+      // TOAST: Success
+      toast.success("Image uploaded!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      // TOAST: Error
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -149,14 +159,19 @@ const MissionVision = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving changes...");
+
     try {
       await updateMissionVisionData(formData);
       await fetchData(); // Refresh data
       setIsEditing(false);
-      alert("Section updated successfully!");
+      // TOAST: Success
+      toast.success("Section updated successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      // TOAST: Error
+      toast.error("Failed to save.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -198,28 +213,28 @@ const MissionVision = () => {
 
           {/* Image 1 (Top Left) */}
           <div className="absolute top-0 left-0 md:left-4 w-72 h-48 md:w-96 md:h-64 rounded-2xl shadow-2xl border-[6px] border-white overflow-hidden z-10 transform -rotate-3 hover:rotate-0 transition duration-500 group/img1">
-             <img 
-               src={content.images.img1} 
-               alt="Mission" 
-               className="w-full h-full object-cover"
-             />
-             <div className="absolute bottom-0 left-0 w-full bg-blue-900/90 p-3">
+              <img 
+                src={content.images.img1} 
+                alt="Mission" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 w-full bg-blue-900/90 p-3">
                 <span className="text-white text-xs md:text-sm font-bold uppercase tracking-widest block text-center">Mission</span>
-             </div>
-             {isEditing && <UploadOverlay onChange={(e) => handleImageUpload(e, 'img1')} label="Change Mission Img" />}
+              </div>
+              {isEditing && <UploadOverlay onChange={(e) => handleImageUpload(e, 'img1')} label="Change Mission Img" />}
           </div>
 
           {/* Image 2 (Bottom Right) */}
           <div className="absolute bottom-0 right-0 md:right-4 w-72 h-48 md:w-96 md:h-64 rounded-2xl shadow-2xl border-[6px] border-white overflow-hidden z-20 transform rotate-3 hover:rotate-0 transition duration-500 group/img2">
-             <img 
-               src={content.images.img2} 
-               alt="Vision" 
-               className="w-full h-full object-cover"
-             />
-             <div className="absolute bottom-0 left-0 w-full bg-red-700/90 p-3">
+              <img 
+                src={content.images.img2} 
+                alt="Vision" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 w-full bg-red-700/90 p-3">
                 <span className="text-white text-xs md:text-sm font-bold uppercase tracking-widest block text-center">Vision</span>
-             </div>
-             {isEditing && <UploadOverlay onChange={(e) => handleImageUpload(e, 'img2')} label="Change Vision Img" />}
+              </div>
+              {isEditing && <UploadOverlay onChange={(e) => handleImageUpload(e, 'img2')} label="Change Vision Img" />}
           </div>
         </div>
 

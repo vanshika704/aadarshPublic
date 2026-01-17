@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 // 1. Auth & Service
 import { useAuth } from '../context/AuthContext';
-// FIX: Import getRulesData to fetch data directly
 import { getRulesData, updateRulesData } from '../services/content.service';
 
 // --- Icon Mapping Helper ---
@@ -32,69 +31,69 @@ const iconMap = {
   FileText: FileText
 };
 
-// --- Fallback Data ---
+// --- Updated Data based on your text ---
 const FALLBACK_DATA = {
   hero: {
-    title: "Rules & Regulations",
-    subtitle: "A guide to the standards and procedures that maintain the excellence of Adarsh Senior Secondary School."
+    title: "Admission Rules & Regulations",
+    subtitle: "Guidelines for Admission, Withdrawal, and Administrative Procedures."
   },
   admission: {
-    title: "Admission Guidelines",
+    title: "Admission Schedule & Eligibility",
     schedule: [
-      { id: 1, label: "Registration Starts", value: "1st February", highlight: false },
-      { id: 2, label: "Session Starts", value: "1st April", highlight: false }
+      { id: 1, label: "Registration Starts", value: "1st February (Every Year)", highlight: false },
+      { id: 2, label: "New Session Starts", value: "1st April (All Classes incl. IX & XI)", highlight: false }
     ],
     eligibility: [
-      { id: 1, label: "Nursery", value: "Minimum age of 3+ years." },
-      { id: 2, label: "Class I Onwards", value: "Admission strictly based on Entrance Tests & Interviews." }
+      { id: 1, label: "Nursery Class", value: "Candidate should be 3+ years of age." },
+      { id: 2, label: "Class I & Onwards", value: "Admission based on Entrance Tests & Interviews." }
     ],
     steps: [
-      { id: 1, step: "01", title: "Registration", desc: "Register for the Entrance Test as per the schedule." },
-      { id: 2, step: "02", title: "Assessment", desc: "Appear for the written Entrance Test followed by a personal Interview." },
-      { id: 3, step: "03", title: "Admission", desc: "Offer letter issued subject to merit and seat availability." }
+      { id: 1, step: "01", title: "Registration", desc: "Eligible candidates must register for the Entrance Test as per the schedule." },
+      { id: 2, step: "02", title: "Test & Interview", desc: "Appear for the Entrance Test followed by an Interview on the scheduled date." },
+      { id: 3, step: "03", title: "Admission Offer", desc: "Based on performance and seat availability, admission will be offered." }
     ]
   },
   withdrawal: {
-    title: "Withdrawal Policy",
-    description: "Parents intending to withdraw their child must submit a written application 15 days in advance. The School Leaving Certificate will be processed and issued 7 days post-application.",
+    title: "Withdrawal & Refund Rules",
+    description: "Parents can withdraw their child by submitting an application 15 days in advance. The School Leaving Certificate will be issued 7 days after the date of submission.",
     refundTable: [
-      { id: 1, period: "Within 1st Month", refund: "100% Refund", type: "success" },
-      { id: 2, period: "Within 2 Months", refund: "50% Refund", type: "info" },
-      { id: 3, period: "After 2 Months", refund: "No Refund (Security Deposit only)", type: "danger" }
+      { id: 1, period: "Within 1st Month", refund: "Full Refund (Building fund & Annual dues)", type: "success" },
+      { id: 2, period: "Within 2 Months", refund: "50% Refund (Building fund & Annual dues)", type: "info" },
+      { id: 3, period: "After 2 Months", refund: "No Refund (Except Security Deposit)", type: "danger" }
     ]
   },
   dues: {
-    title: "Dues & Facilities",
+    title: "Facility Discontinuance Dues",
     cards: [
       {
         id: 1,
         icon: "Wallet",
-        title: "Boarding Changes",
-        desc: "Boarders converting to Day Scholars must pay full hostel charges for the remaining session.",
+        title: "Boarding to Day Scholar",
+        desc: "If a boarder wants to become a day scholar, he/she is required to pay full charges of a regular hostler for the remaining part of that session.",
         theme: "blue"
       },
       {
         id: 2,
         icon: "Bus",
-        title: "Transport Facility",
-        desc: "Discontinuing bus service mid-session requires payment of conveyance charges for the complete session.",
+        title: "Transport Withdrawal",
+        desc: "Stopping conveyance mid-session requires payment of conveyance charges for the complete session.",
         theme: "blue"
       },
       {
         id: 3,
         icon: "AlertTriangle",
         title: "Disciplinary Action",
-        desc: "Expulsion from hostel or transport due to indiscipline does not waive fees. Regular charges apply.",
+        desc: "Expulsion from hostel/vehicle due to indiscipline does not waive fees. The student must pay charges for the remaining period.",
         theme: "red"
       }
     ]
   },
   administrative: {
-    title: "Important Administrative Notes",
+    title: "Administrative Notes",
     notes: [
-      { id: 1, title: "Security Deposit", desc: "Must be claimed within one year of leaving, otherwise adjusted to society funds." },
-      { id: 2, title: "Document Attestation", desc: "Verification of documents takes 3 days from the date of submission." },
-      { id: 3, title: "Document Preparation", desc: "New documents prepared by school authorities are delivered 7 days after request." }
+      { id: 1, title: "Security Deposit Claim", desc: "Must be claimed within one year of leaving the school, otherwise it shall be adjusted to society funds." },
+      { id: 2, title: "Document Attestation", desc: "Verified/attested documents will be delivered 3 days after the date of submission." },
+      { id: 3, title: "Document Preparation", desc: "Any new document prepared by school authorities will be delivered 7 days after request." }
     ]
   }
 };
@@ -166,7 +165,7 @@ export default function RulesRegulations() {
 
   /* --- HANDLERS --- */
 
-  // 1. Generic Array Update Helper (for schedule, eligibility, etc.)
+  // 1. Generic Array Update Helper
   const handleArrayChange = (section, arrayName, index, field, value) => {
     setPageData(prev => {
       const newState = { ...prev };
@@ -236,7 +235,7 @@ export default function RulesRegulations() {
 
       {/* HEADER */}
       <div className="flex items-center justify-center text-center gap-3 mb-2 mt-8">
-          <h2 className="text-5xl font-bold text-blue-900">
+          <h2 className="text-4xl md:text-5xl font-bold text-blue-900 px-4">
             {isEditing ? (
                 <input 
                     value={pageData.hero.title}

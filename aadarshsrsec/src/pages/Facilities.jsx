@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Bus, Monitor, BookOpen, Building2, ShieldCheck, Wifi, Edit, Save, X, Upload, Loader2 } from 'lucide-react';
-// 1. Auth & Service
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
-// FIX: Import getInfraPageData to fetch data directly
 import { getInfraPageData, updateInfraPageData, uploadFile } from '../services/content.service';
 
 // Default Assets
@@ -88,7 +89,15 @@ const UploadOverlay = ({ onChange }) => (
   <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity">
     <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded shadow-lg flex gap-2 items-center hover:bg-gray-100 transform hover:scale-105 transition-all">
       <Upload size={14} /> <span className="text-xs font-bold uppercase">Change</span>
-      <input type="file" hidden accept="image/*" onChange={onChange} />
+      <input 
+        type="file" 
+        hidden 
+        accept="image/*" 
+        onChange={(e) => {
+            onChange(e);
+            e.target.value = ''; // Reset input
+        }} 
+      />
     </label>
   </div>
 );
@@ -113,6 +122,7 @@ const Infrastructure = () => {
       setServerData(data);
     } catch (error) {
       console.error("Error fetching infra page data:", error);
+      toast.error("Failed to load page content.");
     }
   };
 
@@ -171,15 +181,19 @@ const Infrastructure = () => {
   const handleFeatureImageUpload = async (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "infra_features");
       const newFeatures = [...formData.features];
       newFeatures[index].image = url;
       setFormData(prev => ({ ...prev, features: newFeatures }));
+      toast.success("Image uploaded!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -189,15 +203,19 @@ const Infrastructure = () => {
   const handleGalleryUpload = async (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    const toastId = toast.loading("Updating gallery...");
+
     try {
       const url = await uploadFile(file, "infra_gallery");
       const newGallery = [...formData.gallery];
       newGallery[index].src = url;
       setFormData(prev => ({ ...prev, gallery: newGallery }));
+      toast.success("Gallery updated!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -205,14 +223,16 @@ const Infrastructure = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    const toastId = toast.loading("Saving changes...");
+
     try {
       await updateInfraPageData(formData);
       await fetchData(); // Refresh data
       setIsEditing(false);
-      alert("Page updated successfully!");
+      toast.success("Page updated successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setLoading(false);
     }

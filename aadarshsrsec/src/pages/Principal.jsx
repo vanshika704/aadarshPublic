@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, Upload, Loader2 } from 'lucide-react';
-// 1. Auth & Service
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 // FIX: Import getPrincipalPageData to fetch data directly
 import { getPrincipalPageData, updatePrincipalPageData, uploadFile } from '../services/content.service';
@@ -59,6 +61,7 @@ const Principal = () => {
       setServerData(data);
     } catch (error) {
       console.error("Error fetching principal data:", error);
+      toast.error("Failed to load principal's message.");
     }
   };
 
@@ -115,16 +118,23 @@ const Principal = () => {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading photo...");
+
     try {
       const url = await uploadFile(file, "principal_assets");
       setFormData(prev => ({
         ...prev,
         principal: { ...prev.principal, image: url }
       }));
+      // TOAST: Success
+      toast.success("Photo uploaded!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      // TOAST: Error
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -132,14 +142,19 @@ const Principal = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving changes...");
+
     try {
       await updatePrincipalPageData(formData);
       await fetchData(); // Refresh data
       setIsEditing(false);
-      alert("Principal page updated!");
+      // TOAST: Success
+      toast.success("Principal page updated!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      // TOAST: Error
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -160,7 +175,7 @@ const Principal = () => {
       )}
 
       {isEditing && (
-        <div className="fixed bottom-10 right-10 z-[100] flex gap-2 animate-bounce-in">
+        <div className="fixed bottom-10 right-10 z-100 flex gap-2 animate-bounce-in">
           <button onClick={cancelEdit} className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-full shadow-xl flex items-center gap-2 font-bold">
             <X size={18} /> Cancel
           </button>

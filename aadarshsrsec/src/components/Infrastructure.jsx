@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // IMPORT LINK
+import { Link } from "react-router-dom"; 
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Edit, Save, X, Upload, Trash2, Plus, Loader2 } from "lucide-react";
-// 1. Import Auth Context
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from "../context/AuthContext";
 // 2. Import Service Functions
 import { updateInfraData, uploadFile } from "../services/content.service";
@@ -66,7 +68,7 @@ const UploadOverlay = ({ onChange }) => (
         accept="image/*" 
         onChange={(e) => {
             onChange(e);
-            e.target.value = ''; // Reset input so same file can be selected again
+            e.target.value = ''; 
         }} 
       />
     </label>
@@ -104,14 +106,18 @@ const SchoolInfrastructure = ({ data, refreshData }) => {
   const handleImageUpload = async (e, fieldName) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "infra_assets");
       // Immediate state update to show the new image
       setFormData((prev) => ({ ...prev, [fieldName]: url }));
+      toast.success("Image uploaded!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -121,16 +127,20 @@ const SchoolInfrastructure = ({ data, refreshData }) => {
   const handleGalleryAdd = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    const toastId = toast.loading("Adding to gallery...");
+
     try {
       const url = await uploadFile(file, "infra_gallery");
       setFormData((p) => ({
         ...p,
         leftGallery: [...p.leftGallery, url],
       }));
+      toast.success("Added to gallery!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Gallery upload failed");
+      toast.error("Gallery upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -139,25 +149,28 @@ const SchoolInfrastructure = ({ data, refreshData }) => {
   // Handle Gallery Remove
   const handleGalleryRemove = (idx) => {
     if (!window.confirm("Delete this image?")) return;
+    
     setFormData((p) => ({
       ...p,
       leftGallery: p.leftGallery.filter((_, i) => i !== idx),
     }));
+    toast.success("Image removed (Click Save to apply).");
   };
 
   const handleSave = async () => {
     setLoading(true);
+    const toastId = toast.loading("Saving changes...");
+
     try {
       await updateInfraData(formData);
       
-      // FIX: Refresh the parent data so the new image persists when we exit edit mode
       if(refreshData) await refreshData();
       
       setIsEditing(false);
-      alert("Infrastructure section updated!");
+      toast.success("Infrastructure section updated!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save changes.");
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setLoading(false);
     }

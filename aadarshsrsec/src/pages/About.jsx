@@ -1,137 +1,8 @@
-// import React from 'react';
-// import img1 from "../assets/banner1.jpg"
-
-// import img2 from "../assets/chairman.jpg";
-// const About = ({ data }) => {
-//   // 1. Fallback Data
-//   const defaultContent = {
-//     schoolName: "Adarsh Senior Secondary Public School, Nahra",
-//     schoolImage: img1, 
-//     aboutTitle: "A Tradition of Excellence Since 1995",
-//     aboutText: [
-//       "Since 1995, Adarsh Senior Secondary School has offered a safe, pleasant, and nurturing environment for students from mountain city preschool to senior secondary level. We are dedicated to providing first-class education to embrace the vision of our students achieving excellence through their experience at Adarsh school.",
-//       "Located in the suburbs of Haryana, the school started as a humble effort in 1995 with the mission of rural educational development. During its journey, it has evolved as a pioneer in the field of education and is now better known as a synonym for right education direction.",
-//       "It is not hyperbolical to say that less known places like Nahra, a small village, are now well-recognized names in educational corridors for producing a large number of well-qualified professionals. Adarsh Senior Secondary Public School, Nahra, in its true sense, is a ray of hope for this rural belt of Haryana. The school is co-educational, English-medium for classes Nursery to XII, and is affiliated with C.B.S.E., New Delhi."
-//     ],
-//     chairman: {
-//       name: "Dr. T.P. Singh",
-//       designation: "Chairman",
-//       credentials: "Educationist, Mathematician, & Researcher",
-//       image: img2, 
-//       message: "Education is the passport to the future, a challenge for tomorrow belongs to those who prepare for it today. Adarsh Sr. Sec. School has been striving hard since 1995 to fulfill this dream of students to acquire quality education and hence, prepare them to face the challenge of future. For the last 27 years, the school has been trying to keep pace with the rural and backward area students with the latest developments in the field of education and information on the pattern of CBSE NEW DELHI. An environment of academic excellence, self discipline, co-curricular activities, and sports culture has made our school a preferred destination for the knowledge seekers of this region.",
-//       welcomeNote: "It is a matter of great pleasure and honor for me to welcome the new principal of Adarsh Sen Sec School, Ms. Anju Batra, who has previously worked for 16 years in various institutions and remained successful in delivering positive results. Congratulations to the principal, staff team, and students for making innovative and inspiring work."
-//     }
-//   };
-
-//   const content = data || defaultContent;
-
-//   return (
-//     // Reduced vertical padding from py-16 to py-10
-//     <section className="relative w-full bg-white py-10 px-4 md:px-8 overflow-hidden">
-      
-//       {/* --- Main Grid --- */}
-//       {/* Reduced gap from 12 to 8 */}
-//       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        
-//         {/* Left: School Image */}
-//         <div className="relative group">
-//           <div className="absolute -inset-2 bg-linear-to-tr from-blue-900 to-red-700 rounded-xl opacity-20 group-hover:opacity-30 transition duration-500 blur-lg"></div>
-          
-//           {/* Reduced Height: h-[400/500px] -> h-[280/380px] */}
-//           <div className="relative h-[380px] lg:h-[580px] w-full rounded-xl overflow-hidden shadow-xl border-2 border-white">
-//             <img 
-//               src={content.schoolImage} 
-//               alt="School Campus" 
-//               className="w-full h-full object-cover transform group-hover:scale-105 transition duration-700 ease-in-out"
-//             />
-//             {/* Badge Overlay: Smaller padding and font */}
-//             <div className="absolute bottom-4 left-4 bg-red-700 text-white px-4 py-2 rounded shadow-lg">
-//               <span className="block text-[10px] font-medium uppercase tracking-wider">Est.</span>
-//               <span className="block text-xl font-bold">1995</span>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Right: Text Content */}
-//         <div className="space-y-4">
-//           <div className="inline-block">
-//             <h4 className="text-red-700 font-bold uppercase tracking-widest text-[10px] mb-1">Who We Are</h4>
-//             {/* Font reduced: text-5xl -> text-3xl */}
-//             <h2 className="text-2xl md:text-3xl font-bold text-blue-900 leading-tight">
-//               {content.schoolName}
-//             </h2>
-//             <div className="h-1 w-16 bg-red-700 mt-3 rounded-full"></div>
-//           </div>
-
-//           {/* Font reduced: text-lg -> text-sm/base */}
-//           <div className="space-y-3 text-gray-600 text-sm md:text-base leading-relaxed text-justify">
-//              {content.aboutText && content.aboutText.map((paragraph, index) => (
-//                 <p key={index}>{paragraph}</p>
-//              ))}
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* --- Bottom Section: Chairman's Message --- */}
-//       {/* Margin reduced: mt-20 -> mt-12 */}
-//       <div className="max-w-6xl mx-auto mt-12">
-//         {/* Padding reduced: p-8/12 -> p-6/8 */}
-//         <div className="bg-slate-50 rounded-2xl p-6 md:p-8 border-l-4 border-red-700 shadow-sm relative">
-          
-//           {/* Quote Icon scaled down */}
-//           <div className="absolute top-2 right-6 text-6xl text-gray-200 font-serif opacity-50 select-none">
-//             &rdquo;
-//           </div>
-
-//           <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-            
-//             {/* Chairman Avatar: Scaled down significantly */}
-//             <div className="shrink-0 w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
-//               <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-2 border-blue-900 shadow-lg overflow-hidden mb-3">
-//                 <img 
-//                   src={content.chairman.image} 
-//                   alt={content.chairman.name} 
-//                   className="w-full h-full object-cover"
-//                 />
-//               </div>
-//               <h3 className="text-lg font-bold text-blue-900">{content.chairman.name}</h3>
-//               <p className="text-red-700 font-medium text-[10px]">{content.chairman.designation}</p>
-//               <p className="text-gray-500 text-[10px] mt-0.5 max-w-[150px]">{content.chairman.credentials}</p>
-//             </div>
-
-//             {/* Message Content */}
-//             <div className="flex-1">
-//               <h3 className="text-xl font-bold text-blue-900 mb-4">Message from the Chairman</h3>
-              
-//               {/* Text size reduced */}
-//               <div className="text-gray-700 space-y-3 italic leading-relaxed text-sm md:text-base">
-//                 <p>"{content.chairman.message}"</p>
-//                 <p className="font-medium text-blue-900 not-italic border-l-2 border-blue-900 pl-3 bg-white py-2 pr-2 rounded-r">
-//                   {content.chairman.welcomeNote}
-//                 </p>
-//               </div>
-
-//               <div className="mt-6 flex items-center justify-end">
-//                 <div className="text-right">
-//                   <p className="text-gray-900 font-signature text-lg">Best Wishes,</p>
-//                   <p className="text-red-700 font-bold mt-0.5 text-sm">{content.chairman.name}</p>
-//                 </div>
-//               </div>
-//             </div>
-
-//           </div>
-//         </div>
-//       </div>
-
-//     </section>
-//   );
-// };
-
-// export default About;
-
 import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, Upload, Loader2 } from 'lucide-react';
-// 1. Import Auth Context
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 // 2. Import Service Functions
 // FIX: Import 'getAboutPageData' to fetch data directly
@@ -248,7 +119,11 @@ const About = () => {
   const handleImageUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
+
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "about_assets");
       setFormData(prev => {
@@ -259,9 +134,12 @@ const About = () => {
         }
         return prev;
       });
+      // TOAST: Success
+      toast.success("Image uploaded!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      // TOAST: Error
+      toast.error("Upload failed.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -269,6 +147,9 @@ const About = () => {
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving changes...");
+
     try {
       // Update the 'about_page' document
       await updateAboutPageData(formData);
@@ -277,10 +158,12 @@ const About = () => {
       await fetchData();
 
       setIsEditing(false);
-      alert("About page updated successfully!");
+      // TOAST: Success
+      toast.success("About page updated successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
-      alert("Failed to save.");
+      // TOAST: Error
+      toast.error("Failed to save.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -302,7 +185,7 @@ const About = () => {
 
       {/* SAVE CONTROLS */}
       {isEditing && (
-        <div className="fixed bottom-10 right-10 z-[100] flex gap-2 animate-bounce-in">
+        <div className="fixed bottom-10 right-10 z-100 flex gap-2 animate-bounce-in">
           <button onClick={cancelEdit} className="bg-white text-gray-700 border border-gray-200 px-5 py-2 rounded-full shadow-xl flex gap-2 items-center font-bold">
             <X size={18} /> Cancel
           </button>

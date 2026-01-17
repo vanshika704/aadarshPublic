@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Send, Loader2, Edit, Save, X } from 'lucide-react';
-// 1. Auth & Service
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 import { getContactData, updateContactData } from '../services/content.service';
 
@@ -49,6 +51,7 @@ const Contact = () => {
         if (data) setContent(prev => ({ ...prev, ...data }));
       } catch (error) {
         console.error("Failed to fetch contact data", error);
+        toast.error("Failed to load contact info.");
       } finally {
         setLoading(false);
       }
@@ -67,7 +70,7 @@ const Contact = () => {
       } else if (section) {
         newState[section][field] = value;
       } else {
-        newState[field] = value; // Root level fields
+        newState[field] = value; 
       }
       return newState;
     });
@@ -75,13 +78,18 @@ const Contact = () => {
 
   const handleSaveContent = async () => {
     setSaveLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Saving contact info...");
+
     try {
       await updateContactData(content);
       setIsEditing(false);
-      alert("Contact information updated!");
+      // TOAST: Success
+      toast.success("Contact information updated!", { id: toastId });
     } catch (error) {
       console.error(error);
-      alert("Failed to save changes.");
+      // TOAST: Error
+      toast.error("Failed to save changes.", { id: toastId });
     } finally {
       setSaveLoading(false);
     }
@@ -94,8 +102,12 @@ const Contact = () => {
 
   const handleUserFormSubmit = (e) => {
     e.preventDefault();
+    // Simulate Backend Call
     console.log("Sending data to backend:", userForm);
-    alert("Message Sent! We will contact you shortly.");
+    
+    // TOAST: Success for User Form
+    toast.success("Message Sent! We will contact you shortly.");
+    
     setUserForm({ name: '', phone: '', email: '', message: '' });
   };
 

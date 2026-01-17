@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { Edit, Save, X, Upload } from 'lucide-react';
+// IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../context/AuthContext';
 import { updateAnnualFunctionData, uploadFile } from '../services/content.service';
 
@@ -20,19 +23,12 @@ const AnnualFunction = ({ data, refreshData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // Initialize state with defaults. We don't worry about 'data' here yet.
-  // The display logic handles the 'view' mode, and startEdit handles the 'edit' mode.
   const [formData, setFormData] = useState(DEFAULTS);
 
-  // --- LOGIC EXPLANATION ---
-  // 1. VIEW MODE: We combine DEFAULTS + data (from props). This ensures we always see the latest data.
-  // 2. EDIT MODE: We use formData (state).
   const displayData = isEditing ? formData : { ...DEFAULTS, ...data };
 
   // --- HANDLERS ---
   
-  // FIX: Capture the latest data ONLY when the user clicks Edit.
-  // This removes the need for useEffect and fixes the error.
   const startEdit = () => {
     setFormData({ ...DEFAULTS, ...data });
     setIsEditing(true);
@@ -52,26 +48,37 @@ const AnnualFunction = ({ data, refreshData }) => {
     if (!file) return;
 
     setLoading(true);
+    // TOAST: Start Loading
+    const toastId = toast.loading("Uploading image...");
+
     try {
       const url = await uploadFile(file, "annual_function");
       setFormData(prev => ({ ...prev, image: url }));
+      // TOAST: Success
+      toast.success("Image uploaded!", { id: toastId });
     } catch (error) {
       console.error(error);
-      alert("Image upload failed");
+      // TOAST: Error
+      toast.error("Image upload failed", { id: toastId });
     }
     setLoading(false);
   };
 
   const handleSave = async () => {
     setLoading(true);
+    // TOAST: Start Loading
+    const toastId = toast.loading("Saving changes...");
+
     try {
       await updateAnnualFunctionData(formData);
       if (refreshData) await refreshData();
       setIsEditing(false);
-      alert("Annual Function section updated successfully!");
+      // TOAST: Success
+      toast.success("Annual Function updated successfully!", { id: toastId });
     } catch (error) {
       console.error(error);
-      alert("Failed to update.");
+      // TOAST: Error
+      toast.error("Failed to update.", { id: toastId });
     }
     setLoading(false);
   };
@@ -185,7 +192,7 @@ const AnnualFunction = ({ data, refreshData }) => {
             </p>
           )}
 
-          {/* Corrected Link Component */}
+          {/* Read More Link */}
           <Link to="/activities/annual-day">
               <motion.button
                 whileHover={{ scale: 1.05, backgroundColor: "#fdecec" }}

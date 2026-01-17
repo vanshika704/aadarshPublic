@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion, useMotionValue } from "framer-motion";
 import { Edit, Trash2, Upload, X, Plus, Loader2 } from "lucide-react";
-// 1. Import Auth Context
+// 1. IMPORT TOAST
+import toast from 'react-hot-toast';
+
 import { useAuth } from "../context/AuthContext";
 // 2. Import Service Functions
 import { uploadBanner, deleteBanner } from "../services/content.service";
 
-// Bottom bar static assets (Ensure paths are correct)
+// Bottom bar static assets
 import img1 from "../assets/20-03-41-348_512.webp";
 import img2 from "../assets/logo.jpg";
 
@@ -24,7 +26,7 @@ const SPRING_OPTIONS = {
 };
 
 /* ================= COMPONENT ================= */
-const HeroCarousel = ({ banners = [] }) => {
+const HeroCarousel = ({ banners = [], refreshData }) => {
   // 3. Strict Admin Check
   const { currentUser, userRole } = useAuth();
   const isAdmin = currentUser && userRole === 'admin';
@@ -82,16 +84,28 @@ const HeroCarousel = ({ banners = [] }) => {
     if (!file) return;
 
     setLoading(true);
+    // TOAST: Loading
+    const toastId = toast.loading("Uploading banner...");
+
     try {
-      // Upload to Firebase Storage & get URL
+      // Upload to Firebase & Update DB
       const url = await uploadBanner(file);
-      // Optimistically update local state
+      
+      // Update local state immediately
       setLocalBanners(prev => [...prev, url]);
+      
+      // Sync with parent
+      if(refreshData) await refreshData();
+
+      // TOAST: Success
+      toast.success("Banner uploaded!", { id: toastId });
     } catch (error) {
       console.error(error);
-      alert("Failed to upload banner.");
+      // TOAST: Error
+      toast.error("Failed to upload.", { id: toastId });
     } finally {
       setLoading(false);
+      e.target.value = ''; // Reset input
     }
   };
 
@@ -99,26 +113,33 @@ const HeroCarousel = ({ banners = [] }) => {
     if (!window.confirm("Are you sure you want to delete this banner?")) return;
 
     setLoading(true);
+    const toastId = toast.loading("Deleting banner...");
+
     try {
-      // Remove from Firestore
+      // Remove from Firestore & Storage
       await deleteBanner(url);
       
       // Update local state
       setLocalBanners(prev => prev.filter((_, i) => i !== index));
       
-      // Safety: adjust index if we deleted the last slide
+      // Adjust index
       if (index <= imgIndex) {
          setImgIndex(prev => Math.max(0, prev - 1));
       }
+
+      // Sync with parent
+      if(refreshData) await refreshData();
+
+      toast.success("Banner deleted!", { id: toastId });
     } catch (error) {
       console.error(error);
-      alert("Failed to delete banner.");
+      toast.error("Failed to delete.", { id: toastId });
     } finally {
       setLoading(false);
     }
   };
 
-  /* ===== EMPTY STATE (No Banners) ===== */
+  /* ===== EMPTY STATE ===== */
   if (localBanners.length === 0 && !isEditing) {
     return (
       <div className="h-[60vh] md:h-[80vh] w-full bg-gray-100 flex items-center justify-center relative border-b border-gray-200">

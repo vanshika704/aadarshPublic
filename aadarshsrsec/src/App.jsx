@@ -12,6 +12,7 @@ import Activities from './pages/Activities';
 import RulesRegulations from './pages/RulesPolicies';
 import Contact from './pages/Contact';
 import AdminLogin from './pages/admin/Login';
+import { Toaster } from 'react-hot-toast';
 
 
 
@@ -26,7 +27,22 @@ function App() {
     <>
       {/* Only show Navbar if not on admin login */}
       {!shouldHideNavbar && <Navbar />}
-
+<Toaster 
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: 'green',
+              secondary: 'black',
+            },
+          },
+        }}
+      />
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
