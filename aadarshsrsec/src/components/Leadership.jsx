@@ -25,6 +25,7 @@ const EditModal = ({ data, onClose, onSave, isSaving }) => {
   };
 
   return (
+    // Restored z-100 as per your original code
     <div className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
@@ -97,74 +98,74 @@ const EditModal = ({ data, onClose, onSave, isSaving }) => {
   );
 };
 
-// --- 2. SINGLE CARD COMPONENT ---
+// --- 2. SINGLE CARD COMPONENT (SCROLLABLE + HIDDEN SCROLLBAR) ---
 const MessageCard = ({ data, isAdmin, onEdit }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const CHAR_LIMIT = 200; 
-  // Safety check for undefined message
   const message = data.message || "";
-  const shouldTruncate = message.length > CHAR_LIMIT;
-  
-  const displayMessage = isExpanded 
-    ? message 
-    : message.substring(0, CHAR_LIMIT) + (shouldTruncate ? "..." : "");
 
   return (
-    <div className="flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full relative group hover:shadow-md transition-shadow">
-      
-      {/* ADMIN EDIT BUTTON */}
-      {isAdmin && (
-        <button 
-          onClick={() => onEdit(data)}
-          className="absolute top-3 right-3 z-10 bg-white/90 p-2 rounded-full shadow-lg text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110"
-          title="Edit Leader"
-        >
-          <Edit2 size={16} />
-        </button>
-      )}
+    <>
+      {/* CSS to hide scrollbar across all browsers */}
+      <style>
+        {`
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+        `}
+      </style>
 
-      {/* Header */}
-      <div className="p-4 border-b border-gray-100 text-center bg-gray-50/50">
-        <h3 className="text-red-800 font-bold uppercase tracking-wider text-xs sm:text-sm">
-          {data.role === "Principal" ? "From the Principal's Desk" : `Message from ${data.role}`}
-        </h3>
-      </div>
-
-      {/* Image */}
-      <div className="w-full h-72 bg-gray-200 relative overflow-hidden">
-        <img 
-          src={data.image || 'https://placehold.co/400x500?text=No+Image'} 
-          alt={data.name} 
-          className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="p-6 flex flex-col grow">
-        <div className="text-center mb-4">
-          <h4 className="text-lg font-bold text-gray-900">{data.name}</h4>
-          {data.subTitle && (
-            <p className="text-xs text-gray-500 font-medium mt-1 uppercase tracking-wide">{data.subTitle}</p>
-          )}
-        </div>
-
-        <div className="text-sm text-gray-600 leading-relaxed text-justify mb-4 whitespace-pre-wrap">
-          {displayMessage}
-        </div>
-
-        {shouldTruncate && (
-          <div className="mt-auto pt-2 flex justify-center">
-            <button 
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 text-xs font-bold text-red-700 hover:text-red-900 uppercase tracking-wide transition-colors"
-            >
-              {isExpanded ? "Read Less" : "Read More"}
-              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-          </div>
+      <div className="flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full relative group hover:shadow-md transition-shadow">
+        
+        {/* ADMIN EDIT BUTTON */}
+        {isAdmin && (
+          <button 
+            onClick={() => onEdit(data)}
+            className="absolute top-3 right-3 z-10 bg-white/90 p-2 rounded-full shadow-lg text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110"
+            title="Edit Leader"
+          >
+            <Edit2 size={16} />
+          </button>
         )}
+
+        {/* Header */}
+        <div className="p-4 border-b border-gray-100 text-center bg-gray-50/50">
+          <h3 className="text-red-800 font-bold uppercase tracking-wider text-xs sm:text-sm">
+            {data.role === "Principal" ? "From the Principal's Desk" : `Message from ${data.role}`}
+          </h3>
+        </div>
+
+        {/* Image */}
+        <div className="w-full h-72 bg-gray-200 relative overflow-hidden">
+          <img 
+            src={data.image || 'https://placehold.co/400x500?text=No+Image'} 
+            alt={data.name} 
+            className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+          />
+        </div>
+
+        {/* Content */}
+        <div className="p-6 flex flex-col grow">
+          <div className="text-center mb-4">
+            <h4 className="text-lg font-bold text-gray-900">{data.name}</h4>
+            {data.subTitle && (
+              <p className="text-xs text-gray-500 font-medium mt-1 uppercase tracking-wide">{data.subTitle}</p>
+            )}
+          </div>
+
+          {/* SCROLLABLE AREA 
+              - Replaced truncation with fixed height scrolling
+              - Added 'no-scrollbar' class to hide the bars
+          */}
+          <div className="text-sm text-gray-600 leading-relaxed text-justify whitespace-pre-wrap h-48 overflow-y-auto no-scrollbar mb-4">
+            {message}
+          </div>
+
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -225,8 +226,6 @@ const LeadershipSection = ({ initialData = [], refreshData }) => {
     <section className="bg-gray-50 py-16 px-4">
       <div className="max-w-7xl mx-auto">
         
-     
-
         {isAdmin && (
             <div className="mb-6 flex justify-center">
                 <span className="bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full border border-red-200">
