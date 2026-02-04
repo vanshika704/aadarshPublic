@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Send, Loader2, Edit, Save, X } from 'lucide-react';
 // 1. IMPORT TOAST
 import toast from 'react-hot-toast';
+import emailjs from "@emailjs/browser";
 
 import { useAuth } from '../context/AuthContext';
 import { getContactData, updateContactData } from '../services/content.service';
@@ -36,7 +37,7 @@ const Contact = () => {
   const isAdmin = currentUser && userRole === 'admin';
 
   const [content, setContent] = useState(DEFAULTS);
-  const [loading, setLoading] = useState(true);
+  const [ setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
@@ -101,23 +102,31 @@ const Contact = () => {
   };
 
   const handleUserFormSubmit = (e) => {
-    e.preventDefault();
-    // Simulate Backend Call
-    console.log("Sending data to backend:", userForm);
-    
-    // TOAST: Success for User Form
-    toast.success("Message Sent! We will contact you shortly.");
-    
-    setUserForm({ name: '', phone: '', email: '', message: '' });
-  };
+  e.preventDefault();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-red-700">
-        <Loader2 className="animate-spin w-10 h-10" />
-      </div>
-    );
-  }
+  const toastId = toast.loading("Sending message...");
+
+  emailjs
+    .send(
+     import.meta.env.VITE_SERVICE_ID,
+  import.meta.env.VITE_TEMPLATE_ID,
+      {
+        name: userForm.name,
+        phone: userForm.phone,
+        email: userForm.email,
+        message: userForm.message,
+      },
+     import.meta.env.VITE_PUBLIC_KEY,
+    )
+    .then(() => {
+      toast.success("Message sent successfully!", { id: toastId });
+      setUserForm({ name: '', phone: '', email: '', message: '' });
+    })
+    .catch((error) => {
+      console.error(error);
+      toast.error("Failed to send message. Try again.", { id: toastId });
+    });
+};
 
   return (
     <div className="bg-gray-50 min-h-screen pb-12 relative group">
