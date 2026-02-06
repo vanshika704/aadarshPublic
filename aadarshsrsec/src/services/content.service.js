@@ -569,3 +569,30 @@ export const getActivitiesData = async () => {
     return null;
   }
 };
+
+/* =========================================
+   18. DOSSIER (Documents)
+   ========================================= */
+const DOSSIER_DOC_REF = doc(db, "siteContent", "dossier");
+
+export const getDossierData = async () => {
+  try {
+    const snap = await getDoc(DOSSIER_DOC_REF);
+    return snap.exists() ? snap.data().items || null : null;
+  } catch (error) {
+    console.error("Error fetching dossier:", error);
+    return null;
+  }
+};
+
+export const updateDossierData = async (dossierItems) => {
+  try {
+    await setDoc(DOSSIER_DOC_REF, { 
+      items: dossierItems,
+      lastUpdated: new Date() 
+    }, { merge: true });
+  } catch (error) {
+    console.error("Error updating dossier:", error);
+    throw error;
+  }
+};
