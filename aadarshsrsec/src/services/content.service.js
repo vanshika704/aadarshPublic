@@ -596,3 +596,30 @@ export const updateDossierData = async (dossierItems) => {
     throw error;
   }
 };
+/* =========================================
+   19. TOP BAR SETTINGS
+   ========================================= */
+const TOPBAR_DOC_REF = doc(db, "siteContent", "topbar");
+
+export const getTopBarData = async () => {
+  try {
+    const snap = await getDoc(TOPBAR_DOC_REF);
+    return snap.exists() ? snap.data() : {
+      marqueeText: "Admissions Open 2026-27",
+      phone: "79882-12029",
+      disclosureLabel: "Mandatory Disclosure"
+    };
+  } catch (error) {
+    console.error("Error fetching topbar:", error);
+    return null;
+  }
+};
+
+export const updateTopBarData = async (data) => {
+  try {
+    await setDoc(TOPBAR_DOC_REF, { ...data, lastUpdated: new Date() }, { merge: true });
+  } catch (error) {
+    console.error("Error updating topbar:", error);
+    throw error;
+  }
+};
